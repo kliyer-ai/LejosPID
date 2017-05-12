@@ -25,24 +25,33 @@ Please make sure to indicate decimals as floats.
 ### Configuration
 There are a bunch of simple configurations that can be made to ensure that the PID controller runs smoothly.
 
+#### Scale Output
+The output of the PID controller is going to be way too small to use it to control the motors. This is due to the fact that the values the LEGO sensors return are between 0 and 1 and these values are used as an input for the controller. Therefore, it is possible to scale the output to a point where it actually influences the motors significantly.
+```java
+  PID.setScale(1000);
+```
+1000 seems like a good value to start with, since the sensor outputs are between 0 and 1, and the PID controller will probably return values between 100 and 1000.
+
+#### Limit Output
+If you are using the PID controller to directly steer the motors, you might want to set a range for the **scaled** output to avoid crazy behaviour.
+```java
+  PID.setScale(1000);
+  PID.setOutputRange(0, 160); 
+  float out = PID.getOutput(sensorInput); //out will always be between 0 and 160, depending on the situation.
+```
+
 #### Set Target Range
 Since the Lego sensors are pretty inaccurate from time to time, it might help to set a range around the desired target in which no error correction is made.
 This can be done in two ways:
 ```java
   PID.setTarget(0.5F);
-  PID.setTargetRange(0.1F); //sets target to anything between 0.4 and 0.6
+  PID.setTargetRange(0.1F); //sets target to anything between 0.4 and 0.6; error will be 0 in this range
 ```
 or simply like this:
 ```java
   PID.setTargetRange(0.4F, 0.6F); //sets target to anything between 0.4 and 0.6
 ```
-
-#### Limit Output
-If you are using the PID controller to directly steer the motors, you might want to set a range for the output to avoid crazy behaviour.
-```java
-  PID.setOutputRange(0, 160); 
-  float out = PID.getOutput(sensorInput); //out will always be between 0 and 160, depending on the situation.
-```
+*I personally have no idea if this actually makes any sense...*
 
 #### Set maximal I Output
 If you find your robot to be massively overshooting, you can limit the output of the integral part with:
@@ -53,7 +62,7 @@ If you find your robot to be massively overshooting, you can limit the output of
 #### Use Kalman Filter
 The PID controller does not use the Kalman filter by default. You can active it by giving it a value between 0 and 1.
 ```java
-  PID.setKalmanFilter(0.5F);
+  PID.setKalmanFilter(0.3F);
 ```
-In this case, the output of the PID controller is 50% determined by the actual sensory input and 50% determined by past sensory input.
+In this case, the output of the PID controller is 30% determined by the actual sensory input and 70% determined by past sensory input.
 This can help to ignore wrong sensory inputs.
