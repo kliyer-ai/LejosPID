@@ -36,14 +36,17 @@ public class LejosPID {
 	
 	public void setP(float p) {
 		P = p;
+		normalize();
 	}
 
 	public void setI(float i) {
 		I = i;
+		normalize();
 	}
 
 	public void setD(float d) {
 		D = d;
+		normalize();
 	}
 	
 	/**
@@ -51,6 +54,7 @@ public class LejosPID {
 	 * @param scale The factor by which you want to scale the output.
 	 */
 	public void setScale(float scale){
+		if(scale==0) return;
 		this.scale=scale;
 	}
 
@@ -144,28 +148,27 @@ public class LejosPID {
 			error = contains(input, minTarget, maxTarget) - input;
 		
 		//calculate P term
-		float pOutput = P*error;
+		float pOutput = scale * P * error;
 		
-		//calculate D term
-		
-		float dOutput = D*(input - lastInput);
+		//calculate D term		
+		float dOutput = scale * D * (input - lastInput);
 		lastInput = input;
 		
 		//calculate I term
-		float iOutput = I * sumError;
+		float iOutput = scale *I * sumError;
 		if(maxIOutput!=0 && !within(iOutput, -maxIOutput, maxIOutput)){
 			iOutput=contains(iOutput, -maxIOutput, maxIOutput);
 			
 			//calculate maximal possible sumError
-			//maxIOuput = I * maxSumError <=> maxSumError = maxIOutput/I
-			float maxSumError = maxIOutput/I;
-			sumError = contains(sumError+error, -maxSumError, maxSumError);			
+			//maxIOuput = I * sumError <=> sumError = maxIOutput/I
+			float maxSumError = maxIOutput/(I*scale); //scales sumError down again
+			sumError = contains(sumError+error, -maxSumError, maxSumError);	//sets sumError to highest value possible		
 		}
 		else
 			sumError+=error;
 		
 		//calculate error and scales it
-		float output = scale * (pOutput + iOutput + dOutput);
+		float output = pOutput + iOutput + dOutput;
 		
 		//check if output exceeds output limits
 		//adjust output if necessary and adjust sumError
