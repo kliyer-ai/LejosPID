@@ -54,9 +54,11 @@ or simply like this:
 *I personally have no idea if this actually makes any sense...*
 
 #### Set maximal I Output
-If you find your robot to be massively overshooting, you can limit the output of the integral part with:
+If you find your robot to be massively overshooting, you can limit the output of the **scaled** integral part. For instance, it might be useful to first set the output range and then limit how much of the scaled output is accounted for by the integral part.
 ```java
-  PID.setMaxIOutput(0.2F);
+  PID.setScale(1000); //exact value has to be found by trial and error
+  PID.setOutputRange(0, 160); //set max output range
+  PID.setMaxIOutput(40); //the integral part(summed error) can only influence the output by 40
 ```
 
 #### Use Kalman Filter
@@ -66,3 +68,9 @@ The PID controller does not use the Kalman filter by default. You can active it 
 ```
 In this case, the output of the PID controller is 30% determined by the actual sensory input and 70% determined by past sensory input.
 This can help to ignore wrong sensory inputs.
+
+#### Reset
+The PID control can be reset, e.g. everytime the behaviour takes action: 
+```java
+  PID.reset();
+```
