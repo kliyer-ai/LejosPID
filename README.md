@@ -20,6 +20,7 @@ Setting up a simple PID controller could look like this:
   ...
   }
 ```
+The order of the parameters is P, I, D. In this case, each parameter is set to 1.
 Please make sure to indicate decimals as floats.
 
 ### Configuration
